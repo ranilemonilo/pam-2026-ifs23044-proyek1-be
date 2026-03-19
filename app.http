@@ -1,0 +1,352 @@
+## Global Variabel
+#@BaseUrl = https://pam-2026-proyek1-ifs23044-be.delcom.org:8080
+@BaseUrl = http://127.0.0.1:8000
+
+### ──────────────────────────────────────
+## Auth
+### ──────────────────────────────────────
+
+### Melakukan pendaftaran
+# @name PostRegister
+POST {{BaseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Budi Santoso",
+  "username": "budi",
+  "password": "budi123"
+}
+
+### Masuk ke layanan
+# @name PostLogin
+POST {{BaseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "budi",
+  "password": "budi123"
+}
+
+> {%
+    client.global.set("authToken", response.body.data.authToken);
+    client.global.set("refreshToken", response.body.data.refreshToken);
+%}
+
+### Refresh token
+# @name PostRefreshToken
+POST {{BaseUrl}}/auth/refresh-token
+Content-Type: application/json
+
+{
+  "authToken": "{{authToken}}",
+  "refreshToken": "{{refreshToken}}"
+}
+
+> {%
+    client.global.set("authToken", response.body.data.authToken);
+    client.global.set("refreshToken", response.body.data.refreshToken);
+%}
+
+### Logout
+# @name PostLogout
+POST {{BaseUrl}}/auth/logout
+Content-Type: application/json
+
+{
+  "authToken": "{{authToken}}"
+}
+
+### ──────────────────────────────────────
+## Users
+### ──────────────────────────────────────
+
+### Mengambil informasi akun saya
+# @name GetUserMe
+GET {{BaseUrl}}/users/me
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+> {%
+    client.global.set("userId", response.body.data.user.id);
+%}
+
+### Mengubah informasi akun saya
+# @name PutUserMe
+PUT {{BaseUrl}}/users/me
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Budi Santoso Update",
+  "username": "budi"
+}
+
+### Mengubah kata sandi
+# @name PutUserMePassword
+PUT {{BaseUrl}}/users/me/password
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "newPassword": "budi123",
+  "password": "budi123"
+}
+
+### Mengubah photo profile
+# @name PutUserMePhoto
+PUT {{BaseUrl}}/users/me/photo
+Authorization: Bearer {{authToken}}
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="example.png"
+Content-Type: image/png
+
+< ./uploads/examples/me.png
+--WebAppBoundary--
+
+### Mengambil photo user berdasarkan id
+@userId = 00000000-0000-0000-0000-000000000000
+
+# @name GetUserPhoto
+GET {{BaseUrl}}/images/users/{{userId}}
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+### ──────────────────────────────────────
+## Pets
+### ──────────────────────────────────────
+
+### Menambahkan pet baru
+# @name PostPet
+POST {{BaseUrl}}/pets
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Mochi",
+  "species": "cat",
+  "breed": "Persian",
+  "age": 12,
+  "gender": "female",
+  "description": "Kucing cantik dan manja, suka bermain",
+  "isForAdoption": true,
+  "isForSale": false
+}
+
+> {%
+    client.global.set("petId", response.body.data.petId);
+%}
+
+### Mengambil semua daftar pet
+# @name GetPets
+GET {{BaseUrl}}/pets?search=&species=&gender=&status=&forAdoption=&forSale=&page=1&size=10
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+### Mengambil detail pet
+# @name GetPetById
+GET {{BaseUrl}}/pets/{{petId}}
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+### Mengubah data pet
+# @name PutPet
+PUT {{BaseUrl}}/pets/{{petId}}
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Mochi Update",
+  "species": "cat",
+  "breed": "Persian",
+  "age": 13,
+  "gender": "female",
+  "description": "Kucing sehat, sudah divaksin",
+  "isForAdoption": true,
+  "isForSale": false
+}
+
+### Mengubah foto pet
+# @name PutPetPhoto
+PUT {{BaseUrl}}/pets/{{petId}}/photo
+Authorization: Bearer {{authToken}}
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="example.png"
+Content-Type: image/png
+
+< ./uploads/examples/me.png
+--WebAppBoundary--
+
+### Mengambil foto pet
+# @name GetPetPhoto
+GET {{BaseUrl}}/images/pets/{{petId}}
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+### Menghapus pet
+# @name DeletePet
+DELETE {{BaseUrl}}/pets/{{petId}}
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+### ──────────────────────────────────────
+## Adoptions
+### ──────────────────────────────────────
+
+### Mengajukan adoption request
+# @name PostAdoption
+POST {{BaseUrl}}/adoptions
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "petId": "{{petId}}",
+  "message": "Saya sangat ingin mengadopsi Mochi. Saya tinggal di rumah besar."
+}
+
+> {%
+    client.global.set("adoptionId", response.body.data.adoptionId);
+%}
+
+### Mengambil semua adoption request saya
+# @name GetAdoptions
+GET {{BaseUrl}}/adoptions?status=&page=1&size=10
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+### Mengambil detail adoption request
+# @name GetAdoptionById
+GET {{BaseUrl}}/adoptions/{{adoptionId}}
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+### Approve / reject adoption request (oleh pemilik pet)
+# @name PutAdoptionStatus
+PUT {{BaseUrl}}/adoptions/{{adoptionId}}/status
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "status": "approved"
+}
+
+### Batalkan adoption request
+# @name DeleteAdoption
+DELETE {{BaseUrl}}/adoptions/{{adoptionId}}
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+### ──────────────────────────────────────
+## Listings
+### ──────────────────────────────────────
+
+### Membuat listing baru
+# @name PostListing
+POST {{BaseUrl}}/listings
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "petId": "{{petId}}",
+  "title": "Jual Kucing Persian Mochi",
+  "description": "Kucing sehat, sudah vaksin lengkap, siap bawa pulang",
+  "price": 1500000
+}
+
+> {%
+    client.global.set("listingId", response.body.data.listingId);
+%}
+
+### Mengambil semua listing
+# @name GetListings
+GET {{BaseUrl}}/listings?search=&species=&minPrice=&maxPrice=&status=active&page=1&size=10
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+### Mengambil detail listing
+# @name GetListingById
+GET {{BaseUrl}}/listings/{{listingId}}
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+### Mengubah data listing
+# @name PutListing
+PUT {{BaseUrl}}/listings/{{listingId}}
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "petId": "{{petId}}",
+  "title": "Jual Kucing Persian Mochi - Harga Nego",
+  "description": "Kucing sehat, sudah vaksin lengkap",
+  "price": 1200000
+}
+
+### Mengubah foto listing
+# @name PutListingPhoto
+PUT {{BaseUrl}}/listings/{{listingId}}/photo
+Authorization: Bearer {{authToken}}
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="example.png"
+Content-Type: image/png
+
+< ./uploads/examples/me.png
+--WebAppBoundary--
+
+### Mengambil foto listing
+# @name GetListingPhoto
+GET {{BaseUrl}}/images/listings/{{listingId}}
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+### Menghapus listing
+# @name DeleteListing
+DELETE {{BaseUrl}}/listings/{{listingId}}
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+### ──────────────────────────────────────
+## Orders
+### ──────────────────────────────────────
+
+### Membuat order baru
+# @name PostOrder
+POST {{BaseUrl}}/orders
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "listingId": "{{listingId}}",
+  "note": "Saya ingin bayar via transfer BCA"
+}
+
+> {%
+    client.global.set("orderId", response.body.data.orderId);
+%}
+
+### Mengambil semua order saya
+# @name GetOrders
+GET {{BaseUrl}}/orders?status=&page=1&size=10
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+### Mengambil detail order
+# @name GetOrderById
+GET {{BaseUrl}}/orders/{{orderId}}
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+### Mengubah status order
+# @name PutOrderStatus
+PUT {{BaseUrl}}/orders/{{orderId}}/status
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "status": "paid"
+}

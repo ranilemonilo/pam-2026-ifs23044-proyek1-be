@@ -1,0 +1,21 @@
+# Gradle
+.gradle/
+build/
+out/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Environment — jangan di-commit!
+.env
+
+# Database & uploads lokal
+data/
+uploads/
+
+# OS
+.DS_Store
+Thumbs.db
