@@ -54,7 +54,7 @@ class PetService(
 
         val petId = petRepo.create(request.toEntity())
 
-        call.respond(DataResponse("success", "Berhasil menambahkan data pet", mapOf("petId" to petId)))
+        call.respond(io.ktor.http.HttpStatusCode.Created, DataResponse("success", "Berhasil menambahkan data pet", mapOf("petId" to petId)))
     }
 
     suspend fun put(call: ApplicationCall) {

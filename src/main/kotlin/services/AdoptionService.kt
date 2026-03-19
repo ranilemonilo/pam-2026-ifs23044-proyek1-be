@@ -60,7 +60,7 @@ class AdoptionService(
             throw AppException(409, "Kamu sudah memiliki request adopsi yang pending untuk pet ini!")
 
         val adoptionId = adoptionRepo.create(request.toEntity())
-        call.respond(DataResponse("success", "Berhasil mengajukan adoption request", mapOf("adoptionId" to adoptionId)))
+        call.respond(io.ktor.http.HttpStatusCode.Created, DataResponse("success", "Berhasil mengajukan adoption request", mapOf("adoptionId" to adoptionId)))
     }
 
     suspend fun putStatus(call: ApplicationCall) {

@@ -3,10 +3,10 @@
 @BaseUrl = http://127.0.0.1:8000
 
 ### ──────────────────────────────────────
-## Auth
+## Auth - User 1 (pemilik pet & seller)
 ### ──────────────────────────────────────
 
-### Melakukan pendaftaran
+### Daftar user 1
 # @name PostRegister
 POST {{BaseUrl}}/auth/register
 Content-Type: application/json
@@ -17,7 +17,7 @@ Content-Type: application/json
   "password": "budi123"
 }
 
-### Masuk ke layanan
+### Login user 1
 # @name PostLogin
 POST {{BaseUrl}}/auth/login
 Content-Type: application/json
@@ -46,15 +46,6 @@ Content-Type: application/json
     client.global.set("authToken", response.body.data.authToken);
     client.global.set("refreshToken", response.body.data.refreshToken);
 %}
-
-### Logout
-# @name PostLogout
-POST {{BaseUrl}}/auth/logout
-Content-Type: application/json
-
-{
-  "authToken": "{{authToken}}"
-}
 
 ### ──────────────────────────────────────
 ## Users
@@ -105,16 +96,14 @@ Content-Type: image/png
 < ./uploads/examples/me.png
 --WebAppBoundary--
 
-### Mengambil photo user berdasarkan id
-@userId = 00000000-0000-0000-0000-000000000000
-
+### Mengambil photo user
 # @name GetUserPhoto
 GET {{BaseUrl}}/images/users/{{userId}}
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
 ### ──────────────────────────────────────
-## Pets
+## Pets (oleh user 1)
 ### ──────────────────────────────────────
 
 ### Menambahkan pet baru
@@ -131,7 +120,7 @@ Content-Type: application/json
   "gender": "female",
   "description": "Kucing cantik dan manja, suka bermain",
   "isForAdoption": true,
-  "isForSale": false
+  "isForSale": true
 }
 
 > {%
@@ -164,7 +153,7 @@ Content-Type: application/json
   "gender": "female",
   "description": "Kucing sehat, sudah divaksin",
   "isForAdoption": true,
-  "isForSale": false
+  "isForSale": true
 }
 
 ### Mengubah foto pet
@@ -186,20 +175,44 @@ GET {{BaseUrl}}/images/pets/{{petId}}
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
-### Menghapus pet
-# @name DeletePet
-DELETE {{BaseUrl}}/pets/{{petId}}
-Authorization: Bearer {{authToken}}
+### ──────────────────────────────────────
+## Auth - User 2 (adopter & buyer)
+### ──────────────────────────────────────
+
+### Daftar user 2
+# @name PostRegisterUser2
+POST {{BaseUrl}}/auth/register
 Content-Type: application/json
 
+{
+  "name": "Siti Rahayu",
+  "username": "siti",
+  "password": "siti123"
+}
+
+### Login user 2
+# @name PostLoginUser2
+POST {{BaseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "siti",
+  "password": "siti123"
+}
+
+> {%
+    client.global.set("authToken2", response.body.data.authToken);
+    client.global.set("refreshToken2", response.body.data.refreshToken);
+%}
+
 ### ──────────────────────────────────────
-## Adoptions
+## Adoptions (oleh user 2)
 ### ──────────────────────────────────────
 
 ### Mengajukan adoption request
 # @name PostAdoption
 POST {{BaseUrl}}/adoptions
-Authorization: Bearer {{authToken}}
+Authorization: Bearer {{authToken2}}
 Content-Type: application/json
 
 {
@@ -211,19 +224,19 @@ Content-Type: application/json
     client.global.set("adoptionId", response.body.data.adoptionId);
 %}
 
-### Mengambil semua adoption request saya
+### Mengambil semua adoption request
 # @name GetAdoptions
 GET {{BaseUrl}}/adoptions?status=&page=1&size=10
-Authorization: Bearer {{authToken}}
+Authorization: Bearer {{authToken2}}
 Content-Type: application/json
 
 ### Mengambil detail adoption request
 # @name GetAdoptionById
 GET {{BaseUrl}}/adoptions/{{adoptionId}}
-Authorization: Bearer {{authToken}}
+Authorization: Bearer {{authToken2}}
 Content-Type: application/json
 
-### Approve / reject adoption request (oleh pemilik pet)
+### Approve adoption request (oleh user 1 - pemilik pet)
 # @name PutAdoptionStatus
 PUT {{BaseUrl}}/adoptions/{{adoptionId}}/status
 Authorization: Bearer {{authToken}}
@@ -236,11 +249,11 @@ Content-Type: application/json
 ### Batalkan adoption request
 # @name DeleteAdoption
 DELETE {{BaseUrl}}/adoptions/{{adoptionId}}
-Authorization: Bearer {{authToken}}
+Authorization: Bearer {{authToken2}}
 Content-Type: application/json
 
 ### ──────────────────────────────────────
-## Listings
+## Listings (oleh user 1)
 ### ──────────────────────────────────────
 
 ### Membuat listing baru
@@ -304,20 +317,14 @@ GET {{BaseUrl}}/images/listings/{{listingId}}
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
-### Menghapus listing
-# @name DeleteListing
-DELETE {{BaseUrl}}/listings/{{listingId}}
-Authorization: Bearer {{authToken}}
-Content-Type: application/json
-
 ### ──────────────────────────────────────
-## Orders
+## Orders (oleh user 2 - buyer)
 ### ──────────────────────────────────────
 
 ### Membuat order baru
 # @name PostOrder
 POST {{BaseUrl}}/orders
-Authorization: Bearer {{authToken}}
+Authorization: Bearer {{authToken2}}
 Content-Type: application/json
 
 {
@@ -332,21 +339,46 @@ Content-Type: application/json
 ### Mengambil semua order saya
 # @name GetOrders
 GET {{BaseUrl}}/orders?status=&page=1&size=10
-Authorization: Bearer {{authToken}}
+Authorization: Bearer {{authToken2}}
 Content-Type: application/json
 
 ### Mengambil detail order
 # @name GetOrderById
 GET {{BaseUrl}}/orders/{{orderId}}
-Authorization: Bearer {{authToken}}
+Authorization: Bearer {{authToken2}}
 Content-Type: application/json
 
 ### Mengubah status order
 # @name PutOrderStatus
 PUT {{BaseUrl}}/orders/{{orderId}}/status
-Authorization: Bearer {{authToken}}
+Authorization: Bearer {{authToken2}}
 Content-Type: application/json
 
 {
   "status": "paid"
+}
+
+### ──────────────────────────────────────
+## Cleanup - Delete (jalankan paling terakhir)
+### ──────────────────────────────────────
+
+### Hapus listing (sebelum hapus pet)
+# @name DeleteListing
+DELETE {{BaseUrl}}/listings/{{listingId}}
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+### Hapus pet (paling terakhir)
+# @name DeletePet
+DELETE {{BaseUrl}}/pets/{{petId}}
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+### Logout user 1
+# @name PostLogout
+POST {{BaseUrl}}/auth/logout
+Content-Type: application/json
+
+{
+  "authToken": "{{authToken}}"
 }

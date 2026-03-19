@@ -57,7 +57,7 @@ class OrderService(
         // Tandai listing sebagai sold
         listingRepo.updateStatus(request.listingId, "sold")
 
-        call.respond(DataResponse("success", "Berhasil membuat order", mapOf("orderId" to orderId)))
+        call.respond(io.ktor.http.HttpStatusCode.Created, DataResponse("success", "Berhasil membuat order", mapOf("orderId" to orderId)))
     }
 
     suspend fun putStatus(call: ApplicationCall) {

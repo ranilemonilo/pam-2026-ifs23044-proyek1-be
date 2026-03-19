@@ -59,7 +59,7 @@ class ListingService(
 
         val listingId = listingRepo.create(request.toEntity())
 
-        call.respond(DataResponse("success", "Berhasil membuat listing", mapOf("listingId" to listingId)))
+        call.respond(io.ktor.http.HttpStatusCode.Created, DataResponse("success", "Berhasil membuat listing", mapOf("listingId" to listingId)))
     }
 
     suspend fun put(call: ApplicationCall) {

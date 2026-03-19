@@ -37,7 +37,7 @@ class AuthService(
         request.password = hashPassword(request.password)
         val userId = userRepository.create(request.toEntity())
 
-        call.respond(DataResponse("success", "Berhasil melakukan pendaftaran", mapOf("userId" to userId)))
+        call.respond(io.ktor.http.HttpStatusCode.Created, DataResponse("success", "Berhasil melakukan pendaftaran", mapOf("userId" to userId)))
     }
 
     suspend fun postLogin(call: ApplicationCall) {
@@ -58,7 +58,7 @@ class AuthService(
             .withAudience(JWTConstants.AUDIENCE)
             .withIssuer(JWTConstants.ISSUER)
             .withClaim("userId", existUser.id)
-            .withExpiresAt(Date(System.currentTimeMillis() + 60 * 60 * 1000)) // 1 jam
+            .withExpiresAt(Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000)) // 1 jam
             .sign(Algorithm.HMAC256(jwtSecret))
 
         refreshTokenRepository.deleteByUserId(existUser.id)
@@ -105,7 +105,7 @@ class AuthService(
             .withAudience(JWTConstants.AUDIENCE)
             .withIssuer(JWTConstants.ISSUER)
             .withClaim("userId", user.id)
-            .withExpiresAt(Date(System.currentTimeMillis() + 60 * 60 * 1000))
+            .withExpiresAt(Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000))
             .sign(Algorithm.HMAC256(jwtSecret))
 
         val strRefreshToken = UUID.randomUUID().toString()
@@ -143,6 +143,6 @@ class AuthService(
         refreshTokenRepository.delete(request.authToken)
         refreshTokenRepository.deleteByUserId(userId)
 
-        call.respond(DataResponse<Unit>("success", "Berhasil logout", null))
+        call.respond(DataResponse(status = "success", "Berhasil logout",  data = null as String?))
     }
 }
