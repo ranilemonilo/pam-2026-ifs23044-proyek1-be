@@ -3,8 +3,8 @@ ktor:
     modules:
       - org.delcom.ApplicationKt.module
   deployment:
-    port: ${APP_PORT:8000}
-    host: ${APP_HOST:localhost}
+    port: ${APP_PORT:8080}
+    host: ${APP_HOST:0.0.0.0}
 
   database:
     host: ${DB_HOST:127.0.0.1}
@@ -14,7 +14,7 @@ ktor:
     password: ${DB_PASSWORD:postgres}
 
   jwt:
-    secret: ${JWT_SECRET:VrrQISTjQiDFsQ2MF794w4cFaQo2daqzGLuMpA+eWng=}
+    secret: "${JWT_SECRET:VrrQISTjQiDFsQ2MF794w4cFaQo2daqzGLuMpA+eWng=}"
 
   app:
-    baseUrl: ${APP_URL:http://localhost:8000}
+    baseUrl: ${APP_URL:http://localhost:8080}
