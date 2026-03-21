@@ -1,7 +1,6 @@
 ## Global Variabel
 #@BaseUrl = https://pam-2026-proyek1-ifs23044-be.delcom.org:8080
-@BaseUrl = http://127.0.0.1:8000
-
+@BaseUrl = https://pam-2026-proyek1-ifs23044-be.ranisito.fun:8080
 ### ──────────────────────────────────────
 ## Auth - User 1 (pemilik pet & seller)
 ### ──────────────────────────────────────
