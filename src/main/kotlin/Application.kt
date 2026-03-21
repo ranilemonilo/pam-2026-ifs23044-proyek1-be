@@ -81,6 +81,7 @@ fun Application.module() {
     install(ContentNegotiation) {
         json(Json {
             explicitNulls     = false
+            encodeDefaults    = true
             prettyPrint       = true
             ignoreUnknownKeys = true
         })
